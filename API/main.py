@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from enum import Enum
 from pydantic import BaseModel
 from typing import Union
+import pickle
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -67,3 +69,52 @@ def read_item(item_id: str):
         raise HTTPException(status_code=404, detail="Item not found")
     return {"item": items[item_id]}
 
+# For iris classifier
+class Iris(BaseModel):
+    sepal_length : float
+    sepal_width : float 
+    petal_length : float
+    petal_width : float
+
+# loading in the model to predict on the data
+
+pickle_in = open('model/classifier.pkl', 'rb')
+classifier = pickle.load(pickle_in)
+
+origins = [
+    "http://localhost:8000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.post("/predict")
+def predict_iris(iris:Iris):
+
+    type = ""
+
+    if(not(iris)):
+        raise HTTPException(status_code=400, 
+                            detail = "Please Provide a valid number")
+    
+    iris_dict = iris.dict()
+    prediction = classifier.predict([[iris.sepal_length, iris.sepal_width, iris.petal_length, iris.petal_width]])
+
+    if(prediction[0] == 0):
+        type = "Iris-setosa"
+
+    elif(prediction[0] == 1):
+        type = "Iris-versicolor"
+    
+    elif(prediction[0] == 2):
+        type = "Iris-virginica"
+        
+    return {
+            "iris_type": type
+           }

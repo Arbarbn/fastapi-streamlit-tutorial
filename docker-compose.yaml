@@ -1,0 +1,18 @@
+version: "1.0"
+
+services:
+  streamlit:
+    build: ./streamlit
+    ports:
+      - 8501:8501
+    depends_on:
+      - api
+
+
+  api:
+    build: ./api
+    ports:
+      - 8000:8000
+
+
+
