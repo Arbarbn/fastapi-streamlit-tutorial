@@ -82,6 +82,7 @@ pickle_in = open('model/classifier.pkl', 'rb')
 classifier = pickle.load(pickle_in)
 
 origins = [
+    "http://localhost:80",
     "http://localhost:8000"
 ]
 
