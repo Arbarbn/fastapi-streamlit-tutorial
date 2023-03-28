@@ -32,7 +32,8 @@ def main():
 	# the prediction function defined above is called to make the prediction
 	# and store it in the variable result
 	if st.button("Predict"):
-		url = "http://172.17.0.1:8000"
+		url1 = "http://172.17.0.1:80"
+		url2 = "http://172.17.0.1:8000"
 
 		data = {
         "sepal_length": sepal_length,
@@ -41,8 +42,11 @@ def main():
 		"petal_width" : petal_width
     	}
 		
-		response = requests.post(f"{url}/predict", json=data, timeout=8000)
-		
+		try :
+			response = requests.post(f"{url1}/predict", json=data, timeout=8000)
+		except:
+			response = requests.post(f"{url2}/predict", json=data, timeout=8000)
+
 		if response.status_code == 200:
 			hasil = response.json()
 			st.success('The output is {}'.format(hasil['iris_type']))
@@ -52,3 +56,4 @@ def main():
 
 if __name__=='__main__':
 	main()
+
